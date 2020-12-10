@@ -1,6 +1,20 @@
+/**
+ * @description       : 
+ * @author            : mateo navarrete
+ * @group             : 
+ * @last modified on  : 12-10-2020
+ * @last modified by  : mateo navarrete
+ * Modifications Log 
+ * Ver   Date         Author            Modification
+ * 1.0   12-10-2020   mateo navarrete   Initial Version
+**/
 // Use .soql files to store SOQL queries.
 // You can execute queries in VS Code by selecting the
 //     query text and running the command:
 //     SFDX: Execute SOQL Query with Currently Selected Text
 
-SELECT Id, Name FROM Account
+// SELECT Id, Name FROM Account
+
+// SELECT Id, Name FROM Account
+//sfdx force:data:soql:query -q "SELECT NameSpacePrefix, DeveloperName, TableEnumOrId, CreatedDate, LastModifiedDate FROM CustomField WHERE TableEnumOrId = 'Opportunity'" -u mnavarrete@justworks.com -t -r csv
+
