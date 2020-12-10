@@ -1,0 +1,229 @@
+<!--
+  @description       : In a valid sandbox environment, sAdminPanel allows sadmins to load & remove mockData. Several safeguards are in place to prevent misuse & are located on the Apex & JS Controllers. This template renders the relative html. Swap icons paths to view locally/remote.
+  @devIconsPath      : /assets/localdev/icons
+  @prodIconsPath     : /_slds/icons
+  @author            : mateo navarrete
+  @group             : BizOps
+  @last modified on  : 12-04-2020
+  @last modified by  : mateo navarrete
+  Modifications Log 
+  Ver   Date         Author                               Modification
+  1.0   11-19-2020   mateo navarrete   Initial Version
+-->
+<template>
+  <div class="slds-box slds-p-around_none slds-m-around_none slds-theme_shade">
+    <div class="slds-grid slds-wrap">
+      <!-- START: LEFT HEADER -->
+      <div class="slds-size_2-of-3">
+        <div
+          class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+        >
+          <lightning-tile type="media">
+            <template if:true={showStateUnactivated}>
+              <span
+                class="slds-icon_container slds-icon-utility-magicwand slds-p-around_xx-small slds-theme_info"
+                slot="media"
+              >
+                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                  <use
+                    xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#magicwand"
+                  ></use>
+                </svg>
+              </span>
+              <h3 class="slds-text-title_bold">sAdmin Panel</h3>
+            </template>
+            <template if:true={showStateActivatedProduction}>
+              <span
+                class="slds-icon_container slds-icon-utility-magicwand slds-p-around_xx-small slds-theme_error"
+                slot="media"
+              >
+                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                  <use
+                    xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#offline"
+                  ></use>
+                </svg>
+              </span>
+              <h3 class="slds-text-title_bold slds-text-color_error">
+                sAdmin Panel
+              </h3>
+            </template>
+            <template if:true={showStateActivatedSandbox}>
+              <span
+                class="slds-icon_container slds-icon-utility-magicwand slds-p-around_xx-small slds-theme_success"
+                slot="media"
+              >
+                <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                  <use
+                    xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#magicwand"
+                  ></use>
+                </svg>
+              </span>
+              <h3 class="slds-text-title_bold slds-text-color_success">
+                sAdmin Panel
+              </h3>
+            </template>
+            <h4 class="slds-text-title_caps text-one-half-rem">
+              version 1.0.1
+            </h4>
+          </lightning-tile>
+          <!-- START: HIDDEN TEXT -->
+          <template if:true={showStateActivatedProduction}>
+            <div
+              class="slds-box slds-box_x-small slds-m-top_small slds-theme_default slds-theme_alert-texture"
+            >
+              <p>
+                sAdmin Panel is only available in a
+                <strong> non-production </strong>
+                environment!
+              </p>
+            </div>
+          </template>
+          <!-- END: HIDDEN TEXT -->
+        </div>
+      </div>
+      <!-- END: LEFT HEADER | START: RIGHT HEADER -->
+      <div class="slds-size_1-of-3">
+        <div
+          class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+        >
+          <template if:true={showStateUnactivatedButton}>
+            <button
+              class="slds-button slds-button_brand slds-button_stretch slds-text-title_bold"
+              onclick={onActivate}
+            >
+              Activate
+              <svg
+                class="slds-button__icon slds-button__icon_right"
+                aria-hidden="true"
+              >
+                <use
+                  xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#sync"
+                ></use>
+              </svg>
+            </button>
+          </template>
+          <template if:true={showStateUnactivatedSpinner}>
+            <div class="slds-box" style="border: none; position: relative">
+              <lightning-spinner
+                alternative-text="Loading..."
+                size="small"
+                variant="brand"
+              ></lightning-spinner>
+            </div>
+          </template>
+          <template if:true={showStateActivatedProduction}>
+            <h3 class="slds-text-title_bold slds-text-color_error">
+              Org Details
+            </h3>
+            <p>
+              <span class="slds-text-title_caps"> Production: </span>
+              &nbsp;
+              <span class="slds-text-title_bold slds-text-color_error">
+                YES
+              </span>
+            </p>
+          </template>
+          <template if:true={showStateActivatedSandbox}>
+            <h3 class="slds-text-title_bold slds-text-color_success">
+              Org Details
+            </h3>
+            <p>
+              <span class="slds-text-title_caps"> Production: </span>
+              &nbsp;
+              <span class="slds-text-title_bold slds-text-color_success">
+                NO
+              </span>
+            </p>
+          </template>
+          <template if:false={showStateUnactivated}>
+            <p>
+              <span class="slds-text-title_caps">Name:</span>
+              &nbsp;{orgData.Name}
+            </p>
+            <p>
+              <span class="slds-text-title_caps">Instance:</span>
+              &nbsp;{orgData.InstanceName}
+            </p>
+            <p>
+              <span class="slds-text-title_caps">Id:</span>
+              &nbsp;{orgData.Id}
+            </p>
+          </template>
+        </div>
+      </div>
+      <!-- END: RIGHT HEADER | START: LOADMOCKDATA -->
+      <div class="slds-size_1-of-3">
+        <template if:true={showStateLoadMockDataButton}>
+          <div
+            class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+          >
+            <button
+              class="slds-button slds-button_brand slds-button_stretch slds-text-title_bold"
+              onclick={onLoadMockData}
+            >
+              Load MockData
+              <svg
+                class="slds-button__icon slds-button__icon_right"
+                aria-hidden="true"
+              >
+                <use
+                  xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#arrow_top"
+                ></use>
+              </svg>
+            </button>
+          </div>
+        </template>
+        <template if:true={showStateLoadMockDataSpinner}>
+          <div
+            class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+          >
+            <div class="slds-box" style="border: none; position: relative">
+              <lightning-spinner
+                alternative-text="Loading..."
+                size="small"
+                variant="brand"
+              ></lightning-spinner>
+            </div>
+          </div>
+        </template>
+      </div>
+      <!-- END: LOADMOCKDATA | START: REMOVEMOCKDATA -->
+      <div class="slds-size_1-of-3">
+        <template if:true={showStateRemoveMockDataButton}>
+          <div
+            class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+          >
+            <button
+              class="slds-button slds-button_destructive slds-button_stretch slds-text-title_bold"
+              onclick={onRemoveMockData}
+            >
+              Remove MockData
+              <svg
+                class="slds-button__icon slds-button__icon_right"
+                aria-hidden="true"
+              >
+                <use
+                  xlink:href="/_slds/icons/utility-sprite/svg/symbols.svg#delete"
+                ></use>
+              </svg>
+            </button>
+          </div>
+        </template>
+        <template if:true={showStateRemoveMockDataSpinner}>
+          <div
+            class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+          >
+            <div class="slds-box" style="border: none; position: relative">
+              <lightning-spinner
+                alternative-text="Loading..."
+                size="small"
+                variant="brand"
+              ></lightning-spinner>
+            </div>
+          </div>
+        </template>
+      </div>
+      <!-- END: REMOVEMOCKDATA -->
+    </div>
+  </div>
+</template>
