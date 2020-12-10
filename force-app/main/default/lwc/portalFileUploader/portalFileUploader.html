@@ -1,0 +1,74 @@
+<!--
+  @description       : Upload & display uploaded files in datatable in sf community portal.
+  @author            : mateo navarrete
+  @group             : BizOps
+  @last modified on  : 12-09-2020
+  @last modified by  : mateo navarrete
+  Modifications Log 
+  Ver   Date         Author            Modification
+  1.0   12-09-2020   mateo navarrete   Initial Version
+-->
+<template>
+  <lightning-file-upload
+    label={label}
+    name="portalFileUploader"
+    accept={acceptedFormats}
+    record-id={recordId}
+    onuploadfinished={handleOnUploadFinished}
+    multiple
+  >
+  </lightning-file-upload>
+
+  <template if:true={showStateFilesUploaded}>
+    <lightning-card>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">
+              <div title="File Name">File Name</div>
+            </th>
+            <th scope="col">
+              <div title="Type">Type</div>
+            </th>
+            <th scope="col">
+              <div title="Uploaded">Uploaded</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={uploadedFiles} for:item="file">
+            <tr class="slds-hint-parent" key={file.documentId}>
+              <th data-label="File Name" scope="row">
+                <div title={file.name}>{file.name}</div>
+              </th>
+              <td data-label="Type">
+                <div title={file.ext}>
+                  <!-- icon-name="doctype:pdf" -->
+                  <lightning-icon
+                    icon-name={file.icon}
+                    size="small"
+                    alternative-text={file.ext}
+                  >
+                  </lightning-icon>
+                </div>
+              </td>
+              <td data-label="Uploaded">
+                <div title="success">
+                  <lightning-icon
+                    icon-name="utility:success"
+                    size="small"
+                    alternative-text="success"
+                    variant="success"
+                  >
+                  </lightning-icon>
+                </div>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </lightning-card>
+  </template>
+</template>
