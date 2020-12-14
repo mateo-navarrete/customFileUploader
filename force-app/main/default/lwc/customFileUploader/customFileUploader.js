@@ -1,12 +1,14 @@
 import { LightningElement, api, track } from "lwc";
 
 export default class CustomFileUploader extends LightningElement {
+  @api contentDocumentIDs;
   @api flexipageRegionWidth;
   @api formats =
     ".csv, .doc, .docx, .gif, .jpeg, .jpg, .pdf, .png, .rtf, .txt, .word, .xls, .xlsx, .zip";
   @api label = "File Uploader";
   @api multipleFiles = false;
   @api recordId;
+  @api uploadedFileNames;
 
   @track uploadedFiles = [];
 
@@ -34,6 +36,9 @@ export default class CustomFileUploader extends LightningElement {
         file.ext = this.getExt(file.name.split(".")[1]);
         file.icon = "doctype:" + file.ext;
         this.uploadedFiles.push(file);
+        console.log("@cIDs", this.contentDocumentIDs);
+        console.log("@uFNs", this.uploadedFileNames);
+        console.log("@rID", this.recordId);
       }
     } catch (err) {
       console.error(err);

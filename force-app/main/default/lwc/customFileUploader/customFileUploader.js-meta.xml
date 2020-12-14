@@ -25,6 +25,18 @@
             label="Related Record ID"
             type="String"
             />
+            <property
+            name="contentDocumentIDs"
+            description="The IDs of the uploaded files. Store this value in a text collection variable."
+            label="Content Document IDs"
+            type="String[]"
+            />
+            <property
+            name="uploadedFileNames"
+            description="The names of the uploaded files. Store this value in a text collection variable."
+            label="Uploaded File Names"
+            type="String[]"
+            />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
