@@ -9,9 +9,11 @@ export default class CustomFileUploader extends LightningElement {
   @api label = "File Uploader";
   @api multipleFiles = false;
   @api recordId;
+  @api title = "Upload files";
   @api uploadedFileNames = [];
 
   @track uploadedFiles = [];
+  apiProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
 
   get acceptedFormats() {
     return this.formats.split(",");
@@ -32,26 +34,22 @@ export default class CustomFileUploader extends LightningElement {
   handleOnUploadFinished(e) {
     try {
       let files = e.detail.files;
-      for (let i = 0; i < files.length; i++) {
-        let file = files[i];
-        file.ext = this.getExt(file.name.split(".")[1]);
-        file.icon = "doctype:" + file.ext;
-        this.uploadedFiles.push(file);
-        console.log("@cIDs", this.contentDocumentIDs);
-        console.log("@uFNs", this.uploadedFileNames);
-        console.log("@rID", this.recordId);
-      }
       files.forEach((file) => {
-        console.log("Uploaded => ", file.documentId, file.name);
         this.contentDocumentIDs.push(file.documentId);
         this.uploadedFileNames.push(file.name);
+        this.updateUploadedFiles(file);
       });
-      console.log("@e", e, files);
-      ["contentDocumentIDs", "uploadedFileNames", "recordId"].forEach((prop) =>
+      apiProps.forEach((prop) =>
         this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
       );
     } catch (err) {
       console.error(err);
     }
+  }
+
+  updateUploadedFiles(file) {
+    file.ext = this.getExt(file.name.split(".")[1]);
+    file.icon = "doctype:" + file.ext;
+    this.uploadedFiles.push(file);
   }
 }

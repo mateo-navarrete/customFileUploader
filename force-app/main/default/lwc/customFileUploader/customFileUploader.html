@@ -11,12 +11,13 @@
 <template>
   <div class={flexipageRegionWidth}>
     <lightning-file-upload
-      label={label}
-      name="customFileUploader"
       accept={acceptedFormats}
-      record-id={recordId}
-      onuploadfinished={handleOnUploadFinished}
+      label={label}
       multiple={multipleFiles}
+      name="customFileUploader"
+      onuploadfinished={handleOnUploadFinished}
+      record-id={recordId}
+      title={title}
     >
     </lightning-file-upload>
 
