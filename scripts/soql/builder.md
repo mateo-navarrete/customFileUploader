@@ -16,8 +16,5 @@
 // OR
 // right click on .soql file > open with... > soql builder
 
-// SELECT Id, Name FROM Account
-
-// SELECT Id, Name FROM Account
 //sfdx force:data:soql:query -q "SELECT NameSpacePrefix, DeveloperName, TableEnumOrId, CreatedDate, LastModifiedDate FROM CustomField WHERE TableEnumOrId = 'Opportunity'" -u mnavarrete@justworks.com -t -r csv
 
