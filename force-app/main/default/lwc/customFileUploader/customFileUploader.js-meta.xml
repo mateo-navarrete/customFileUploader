@@ -12,7 +12,12 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen">
-            <property name="label" description="The text above the 'Upload Files' button." label="File Upload Label" type="String" />
+            <property name="formats" 
+            default=".csv, .doc, .docx, .gif, .jpeg, .jpg, .pdf, .png, .rtf, .txt, .word, .xls, .xlsx, .zip"
+            description="The accepted file types. Enter a comma-separated list of the file extensions that the user can upload. Defaults: .csv, .doc, .docx, .gif, .jpeg, .jpg, .pdf, .png, .rtf, .txt, .word, .xls, .xlsx, .zip" label="Accepted Formats" type="String" />
+            <property name="label" 
+            default="File Uploader" description="The text above the 'Upload Files' button." label="File Upload Label" type="String" />            
+            <property name="multipleFiles" default="false" description="Allow the user to upload multiple files (ex: {!$GlobalConstant.True})." label="Allow Multiple Files" type="boolean"/>
             <property
             name="recordId"
             default="{!recordId}" 
@@ -20,7 +25,6 @@
             label="Related Record ID"
             type="String"
             />
-            <property name="multipleFiles" default="false" description="Allow the user to upload multiple files (ex: {!$GlobalConstant.True})." label="Allow Multiple Files" type="boolean"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
