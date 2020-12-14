@@ -39,7 +39,7 @@ export default class CustomFileUploader extends LightningElement {
         this.uploadedFileNames.push(file.name);
         this.updateUploadedFiles(file);
       });
-      apiProps.forEach((prop) =>
+      this.apiProps.forEach((prop) =>
         this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
       );
     } catch (err) {
