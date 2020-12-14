@@ -11,6 +11,8 @@ export default class CustomFileUploader extends LightningElement {
   @api recordId;
   @api title = "Upload files";
   @api uploadedFileNames = [];
+  // @TODO: handle disable = mulitpleFiles===T ? F : uploadedFiles.length ? T : F
+  // merge with portalFileUploader?
 
   @track uploadedFiles = [];
   apiProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
