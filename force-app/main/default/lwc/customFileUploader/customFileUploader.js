@@ -15,7 +15,8 @@ export default class CustomFileUploader extends LightningElement {
   // merge with portalFileUploader?
 
   @track uploadedFiles = [];
-  apiProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
+  flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
+  inactive = false;
 
   get acceptedFormats() {
     return this.formats.split(",");
@@ -41,12 +42,18 @@ export default class CustomFileUploader extends LightningElement {
         this.uploadedFileNames.push(file.name);
         this.updateUploadedFiles(file);
       });
-      this.apiProps.forEach((prop) =>
+      this.flowProps.forEach((prop) =>
         this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
       );
+      this.updateInactiveStatus();
     } catch (err) {
       console.error(err);
     }
+  }
+
+  updateInactiveStatus() {
+    if (this.multipleFiles || !this.showStateFilesUploaded()) return;
+    this.inactive = true;
   }
 
   updateUploadedFiles(file) {

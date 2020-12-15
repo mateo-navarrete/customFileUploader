@@ -2,7 +2,7 @@
   @description       : Upload & display uploaded files in datatable
   @author            : mateo navarrete
   @group             : BizOps
-  @last modified on  : 12-14-2020
+  @last modified on  : 12-15-2020
   @last modified by  : mateo navarrete
   Modifications Log 
   Ver   Date         Author            Modification
@@ -12,6 +12,7 @@
   <div class={flexipageRegionWidth}>
     <lightning-file-upload
       accept={acceptedFormats}
+      disabled={inactive}
       label={label}
       multiple={multipleFiles}
       name="customFileUploader"
