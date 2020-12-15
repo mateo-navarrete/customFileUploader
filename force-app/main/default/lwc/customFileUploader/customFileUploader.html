@@ -30,41 +30,58 @@
           <thead>
             <tr class="slds-line-height_reset">
               <th scope="col">
+                <div title="Uploaded">Uploaded</div>
+              </th>
+              <th scope="col">
                 <div title="File Name">File Name</div>
               </th>
               <th scope="col">
                 <div title="Type">Type</div>
               </th>
               <th scope="col">
-                <div title="Uploaded">Uploaded</div>
+                <div title="Remove">Remove</div>
               </th>
             </tr>
           </thead>
           <tbody>
             <template for:each={uploadedFiles} for:item="file">
               <tr class="slds-hint-parent" key={file.documentId}>
-                <th data-label="File Name" scope="row">
-                  <div title={file.name}>{file.name}</div>
-                </th>
-                <td data-label="Type">
-                  <div title={file.ext}>
-                    <lightning-icon
-                      icon-name={file.icon}
-                      size="small"
-                      alternative-text={file.ext}
-                    >
-                    </lightning-icon>
-                  </div>
-                </td>
-                <td data-label="Uploaded">
+                <th data-label="Uploaded" scope="row">
                   <div title="success">
                     <lightning-icon
                       icon-name="utility:success"
                       size="small"
                       alternative-text="success"
                       variant="success"
-                    >
-                    </lightning-icon>
+                    ></lightning-icon>
+                  </div>
+                </th>
+                <td data-label="File Name">
+                  <div title={file.name}>{file.name}</div>
+                </td>
+                <td data-label="Type">
+                  <div title={file.ext}>
+                    <lightning-icon
+                      icon-name={file.icon}
+                      size="small"
+                      alternative-text={file.ext}
+                    ></lightning-icon>
+                  </div>
+                </td>
+
+                <td data-label="Remove">
+                  <div title="remove">
+                    <!-- name={file.documentId} -->
+                    <lightning-button-icon
+                      alternative-text="Delete"
+                      icon-name="utility:delete"
+                      name="delete"
+                      onclick={handleClick}
+                      size="small"
+                      title="border-filled"
+                      value={file.documentId}
+                      variant="border-filled"
+                    ></lightning-button-icon>
                   </div>
                 </td>
               </tr>
@@ -74,43 +91,35 @@
       </lightning-card>
     </template>
 
-    <template if:true={visible}>
-      <!-- title='Confirmation Title'
-      message='Are you sure you want to delete this
-      file?'
-      confirm-label='Delete'
-      cancel-label='Cancel'
-      visible={isDialogVisible}
-      original-message={originalMessage}
-      name="confirmModal"
-      onclick={handleDelete}> -->
+    <template if:true={showStateModal}>
       <lightning-card>
         <div class="slds-container_small">
           <section
             role="dialog"
             tabindex="-1"
-            aria-labelledby="modal-heading-01"
+            aria-labelledby="modal-heading"
             aria-modal="true"
-            aria-describedby="modal-content-id-1"
+            aria-describedby="modal-content"
             class="slds-modal slds-fade-in-open"
           >
             <div class="slds-modal__container">
               <header class="slds-modal__header">
                 <h2
-                  id="modal-heading-01"
+                  id="modal-heading"
                   class="slds-text-heading_medium slds-hyphenate"
                 >
-                  {titleLabel}
+                  {modalHeader}
                 </h2>
               </header>
               <div
-                class="slds-modal__content slds-p-around_medium"
-                id="modal-content-id-1"
+                class="slds-modal__content slds-p-around_medium slds-text-align--center"
+                id="modal-content"
               >
-                <p>{message}</p>
+                <p>{modalContent}</p>
               </div>
               <footer class="slds-modal__footer">
                 <lightning-button
+                  class="slds-m-left_xx-small"
                   variant="neutral"
                   name="cancel"
                   label={cancelLabel}
@@ -118,7 +127,8 @@
                   onclick={handleClick}
                 ></lightning-button>
                 <lightning-button
-                  variant="brand"
+                  class="slds-m-left_xx-small"
+                  variant="destructive"
                   name="confirm"
                   label={confirmLabel}
                   title={confirmLabel}

@@ -14,7 +14,7 @@ public with sharing class CustomFileUploaderController {
     Map<String, Boolean> result = new Map<String, Boolean>();
     result.put('success', false);
     try {
-      ContentDocument cd = new List<ContentDocument>();
+      ContentDocument[] cd = new List<ContentDocument>();
       cd = [SELECT Id FROM ContentDocument WHERE Id = :cdIDs];
       delete cd;
       result.put('success', true);
@@ -22,7 +22,7 @@ public with sharing class CustomFileUploaderController {
       //   return 'SUCCESS';
     } catch (Exception e) {
       result.put('success', false);
-      throw new AuraHandledEception(
+      throw new AuraHandledException(
         '\nExceptionMessage: ' +
         e.getMessage() +
         '\nExceptionCause: ' +

@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from "lwc";
 import { FlowAttributeChangeEvent } from "lightning/flowSupport";
 // import { ShowToastEvent } from "lightning/platformShowToastEvent";
-// import deleteDocuments from "@salesforce/apex/uploadController.deleteDocuments";
+import deleteDocuments from "@salesforce/apex/CustomFileUploaderController.deleteDocuments";
 
 export default class CustomFileUploader extends LightningElement {
   @api contentDocumentIDs = [];
@@ -17,18 +17,67 @@ export default class CustomFileUploader extends LightningElement {
   flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
   inactive = false;
 
-  visible = true; //used to hide/show dialog
-  titleLabel = "Confirmation Title"; //modal title
-  name = "confirmModal"; //reference name of the component
-  message = "Are you sure you want to delete this file?"; //modal message
+  doomed = [];
+
+  showStateModal = false; //used to hide/show dialog
+  modalHeader = "Delete File"; //modal title
+  modalContent = "Are you sure you want to delete this file?"; //modal message
+  // name = "confirmModal"; //reference name of the component
   confirmLabel = "Delete"; //confirm button label
   cancelLabel = "Cancel"; //cancel button label
-  originalMessage; //any event/message/detail to be published back to the parent component
+  // originalMessage; //any event/message/detail to be published back to the parent component
   handleClick(e) {
-    console.log("@handleClick", e);
-    console.log("e.target", e.target);
-    console.log("e.target.name", e.target.name);
-    this.visible = !this.visible;
+    const { name, value } = e.target;
+    console.log("@value", value);
+    console.log("@name", name);
+    if (name === "delete") {
+      this.doomed.push(value);
+    } else if (name === "cancel") {
+      this.doomed = [];
+    } else if (name === "confirm") {
+      this.handleDelete();
+    }
+    console.log("uploaded", this.uploadedFiles);
+    console.log("doomed", this.doomed);
+    // console.log("@handleClick", e);
+    // console.log("e.target", e.target);
+    // console.log("e.target.name", e.target.name);
+    this.showStateModal = !this.showStateModal;
+  }
+
+  handleDelete() {
+    //@TODO
+    // show spinner
+    // show notification(success/error)
+    let cdIDs = this.doomed;
+    deleteDocuments({ cdIDs: cdIDs })
+      .then((res) => {
+        console.log("res", res);
+        if (res.success) {
+          let file = this.uploadedFiles.filter((file) => {
+            return file.documentId === cdIDs[0];
+          })[0];
+          this.uploadedFileNames.filter((name) => {
+            return name !== file.name;
+          });
+          this.contentDocumentIDs.filter((id) => {
+            return id !== file.documentId;
+          });
+          this.uploadedFiles.filter((f) => {
+            return f.documentId !== file.documentId;
+          });
+          this.flowProps.forEach((prop) =>
+            this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
+          );
+          this.updateShowState();
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+      })
+      .finally(() => {
+        this.doomed = [];
+      });
   }
 
   // handleRowAction = (e) => {
@@ -157,7 +206,10 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   updateShowState() {
-    if (this.showStateActive()) return;
+    if (this.showStateActive()) {
+      this.inactive = false;
+      return;
+    }
     this.inactive = true;
   }
 
