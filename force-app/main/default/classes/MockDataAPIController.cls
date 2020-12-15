@@ -2,7 +2,7 @@
  * @description       : In a valid sandbox environment, the mockDataAPIController allows sadmins to load & remove mockData. Several safeguards are in place to prevent misuse.
  * @author            : mateo navarrete
  * @group             : BizOps
- * @last modified on  : 12-04-2020
+ * @last modified on  : 12-15-2020
  * @last modified by  : mateo navarrete
  * Modifications Log
  * Ver   Date         Author                               Modification
@@ -74,7 +74,7 @@ public with sharing class MockDataAPIController {
 
   @TestVisible
   private static String[] getMockData(String csvFile) {
-    String[] mockData = new List<String>{};
+    String[] mockData = new List<String>();
     try {
       StaticResource sr = [
         SELECT Body
