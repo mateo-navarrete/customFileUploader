@@ -2,7 +2,7 @@
   @description       : Upload files to sf db. Display those files in a datatable with delete functionality
   @author            : mateo navarrete
   @group             : BizOps
-  @last modified on  : 12-15-2020
+  @last modified on  : 12-16-2020
   @last modified by  : mateo navarrete
   Modifications Log 
   Ver   Date         Author            Modification
@@ -10,6 +10,7 @@
 -->
 <template>
   <div class={flexipageRegionWidth}>
+    <!-- START: FILE UPLOADER -->
     <lightning-file-upload
       accept={acceptedFormats}
       disabled={showStateHideUploader}
@@ -21,7 +22,7 @@
       title={title}
     >
     </lightning-file-upload>
-
+    <!-- END: FILE UPLOADER | START: SPINNER -->
     <template if:true={showStateLoading}>
       <div
         class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
@@ -35,7 +36,7 @@
         </div>
       </div>
     </template>
-
+    <!-- END: SPINNER | START: DATATABLE -->
     <template if:true={showStateFilesUploaded}>
       <lightning-card>
         <table
@@ -104,7 +105,7 @@
         </table>
       </lightning-card>
     </template>
-
+    <!-- END: DATATABLE | START: MODAL -->
     <template if:true={showStateModal}>
       <lightning-card>
         <div class="slds-container_small">
@@ -155,5 +156,6 @@
         </div>
       </lightning-card>
     </template>
+    <!-- END: MODAL -->
   </div>
 </template>
