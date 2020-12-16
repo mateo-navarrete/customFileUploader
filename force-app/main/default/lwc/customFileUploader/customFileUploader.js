@@ -13,10 +13,17 @@ export default class CustomFileUploader extends LightningElement {
   @api recordId;
   @api title = "Upload files";
   @api uploadedFileNames = [];
-  @track uploadedFiles = [];
+  @track uploadedFiles = [
+    {
+      name: "testFile.pdf",
+      icon: "doctype:pdf",
+      documentId: "testdocid000",
+      ext: "pdf"
+    }
+  ];
   flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
   showStateHideUploader = false;
-
+  loadingTest = true;
   loading = false;
   doomed = [];
 

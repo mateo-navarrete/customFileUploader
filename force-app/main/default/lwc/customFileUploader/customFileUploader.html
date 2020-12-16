@@ -9,153 +9,156 @@
   1.0   12-14-2020   mateo navarrete   Initial Version
 -->
 <template>
-  <div class={flexipageRegionWidth}>
-    <!-- START: FILE UPLOADER -->
-    <lightning-file-upload
-      accept={acceptedFormats}
-      disabled={showStateHideUploader}
-      label={label}
-      multiple={multipleFiles}
-      name="customFileUploader"
-      onuploadfinished={handleOnUploadFinished}
-      record-id={recordId}
-      title={title}
-    >
-    </lightning-file-upload>
-    <!-- END: FILE UPLOADER | START: SPINNER -->
-    <template if:true={showStateLoading}>
-      <div
-        class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
-      >
-        <div class="slds-box" style="border: none; position: relative">
-          <lightning-spinner
-            alternative-text="Loading..."
-            size="small"
-            variant="brand"
-          ></lightning-spinner>
-        </div>
-      </div>
-    </template>
-    <!-- END: SPINNER | START: DATATABLE -->
-    <template if:true={showStateFilesUploaded}>
-      <lightning-card>
-        <table
-          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+  <div>
+    <!-- <div
+      class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default slds-is-relative"
+      > -->
+    <div class="slds-box" style="border: none; position: relative">
+      <template if:true={loadingTest}>
+        <lightning-spinner
+          alternative-text="Loading..."
+          size="small"
+          variant="brand"
+        ></lightning-spinner>
+      </template>
+      <div class={flexipageRegionWidth}>
+        <!-- START: FILE UPLOADER -->
+        <lightning-file-upload
+          accept={acceptedFormats}
+          disabled={showStateHideUploader}
+          label={label}
+          multiple={multipleFiles}
+          name="customFileUploader"
+          onuploadfinished={handleOnUploadFinished}
+          record-id={recordId}
+          title={title}
         >
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">
-                <div title="Uploaded">Uploaded</div>
-              </th>
-              <th scope="col">
-                <div title="File Name">File Name</div>
-              </th>
-              <th scope="col">
-                <div title="Type">Type</div>
-              </th>
-              <th scope="col">
-                <div title="Remove">Remove</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={uploadedFiles} for:item="file">
-              <tr class="slds-hint-parent" key={file.documentId}>
-                <th data-label="Uploaded" scope="row">
-                  <div title="success">
-                    <lightning-icon
-                      icon-name="utility:success"
-                      size="small"
-                      alternative-text="success"
-                      variant="success"
-                    ></lightning-icon>
-                  </div>
-                </th>
-                <td data-label="File Name">
-                  <div title={file.name}>{file.name}</div>
-                </td>
-                <td data-label="Type">
-                  <div title={file.ext}>
-                    <lightning-icon
-                      icon-name={file.icon}
-                      size="small"
-                      alternative-text={file.ext}
-                    ></lightning-icon>
-                  </div>
-                </td>
+        </lightning-file-upload>
+        <!-- END: FILE UPLOADER | START: SPINNER -->
 
-                <td data-label="Remove">
-                  <div title="remove">
-                    <!-- name={file.documentId} -->
-                    <lightning-button-icon
-                      alternative-text="Delete"
-                      icon-name="utility:delete"
-                      name="delete"
-                      onclick={handleClick}
-                      size="small"
-                      title="border-filled"
-                      value={file.documentId}
-                      variant="border-filled"
-                    ></lightning-button-icon>
-                  </div>
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </lightning-card>
-    </template>
-    <!-- END: DATATABLE | START: MODAL -->
-    <template if:true={showStateModal}>
-      <lightning-card>
-        <div class="slds-container_small">
-          <section
-            role="dialog"
-            tabindex="-1"
-            aria-labelledby="modal-heading"
-            aria-modal="true"
-            aria-describedby="modal-content"
-            class="slds-modal slds-fade-in-open"
-          >
-            <div class="slds-modal__container">
-              <header class="slds-modal__header">
-                <h2
-                  id="modal-heading"
-                  class="slds-text-heading_medium slds-hyphenate"
-                >
-                  {modalHeader}
-                </h2>
-              </header>
-              <div
-                class="slds-modal__content slds-p-around_medium slds-text-align--center"
-                id="modal-content"
+        <!-- END: SPINNER | START: DATATABLE -->
+        <!-- <template if:true={showStateFilesUploaded}> -->
+        <template if:true={loadingTest}>
+          <lightning-card>
+            <table
+              class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped"
+            >
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">
+                    <div title="Uploaded">Uploaded</div>
+                  </th>
+                  <th scope="col">
+                    <div title="File Name">File Name</div>
+                  </th>
+                  <th scope="col">
+                    <div title="Type">Type</div>
+                  </th>
+                  <th scope="col">
+                    <div title="Remove">Remove</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={uploadedFiles} for:item="file">
+                  <tr class="slds-hint-parent" key={file.documentId}>
+                    <th data-label="Uploaded" scope="row">
+                      <div title="success">
+                        <lightning-icon
+                          icon-name="utility:success"
+                          size="small"
+                          alternative-text="success"
+                          variant="success"
+                        ></lightning-icon>
+                      </div>
+                    </th>
+                    <td data-label="File Name">
+                      <div title={file.name}>{file.name}</div>
+                    </td>
+                    <td data-label="Type">
+                      <div title={file.ext}>
+                        <lightning-icon
+                          icon-name={file.icon}
+                          size="small"
+                          alternative-text={file.ext}
+                        ></lightning-icon>
+                      </div>
+                    </td>
+
+                    <td data-label="Remove">
+                      <div title="remove">
+                        <!-- name={file.documentId} -->
+                        <lightning-button-icon
+                          alternative-text="Delete"
+                          icon-name="utility:delete"
+                          name="delete"
+                          onclick={handleClick}
+                          size="small"
+                          title="border-filled"
+                          value={file.documentId}
+                          variant="border-filled"
+                        ></lightning-button-icon>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </lightning-card>
+        </template>
+        <!-- END: DATATABLE | START: MODAL -->
+        <template if:true={showStateModal}>
+          <lightning-card>
+            <div class="slds-container_small">
+              <section
+                role="dialog"
+                tabindex="-1"
+                aria-labelledby="modal-heading"
+                aria-modal="true"
+                aria-describedby="modal-content"
+                class="slds-modal slds-fade-in-open"
               >
-                <p>{modalContent}</p>
-              </div>
-              <footer class="slds-modal__footer">
-                <lightning-button
-                  class="slds-m-left_xx-small"
-                  variant="neutral"
-                  name="cancel"
-                  label={cancelLabel}
-                  title={cancelLabel}
-                  onclick={handleClick}
-                ></lightning-button>
-                <lightning-button
-                  class="slds-m-left_xx-small"
-                  variant="destructive"
-                  name="confirm"
-                  label={confirmLabel}
-                  title={confirmLabel}
-                  onclick={handleClick}
-                ></lightning-button>
-              </footer>
+                <div class="slds-modal__container">
+                  <header class="slds-modal__header">
+                    <h2
+                      id="modal-heading"
+                      class="slds-text-heading_medium slds-hyphenate"
+                    >
+                      {modalHeader}
+                    </h2>
+                  </header>
+                  <div
+                    class="slds-modal__content slds-p-around_medium slds-text-align--center"
+                    id="modal-content"
+                  >
+                    <p>{modalContent}</p>
+                  </div>
+                  <footer class="slds-modal__footer">
+                    <lightning-button
+                      class="slds-m-left_xx-small"
+                      variant="neutral"
+                      name="cancel"
+                      label={cancelLabel}
+                      title={cancelLabel}
+                      onclick={handleClick}
+                    ></lightning-button>
+                    <lightning-button
+                      class="slds-m-left_xx-small"
+                      variant="destructive"
+                      name="confirm"
+                      label={confirmLabel}
+                      title={confirmLabel}
+                      onclick={handleClick}
+                    ></lightning-button>
+                  </footer>
+                </div>
+              </section>
+              <div class="slds-backdrop slds-backdrop_open"></div>
             </div>
-          </section>
-          <div class="slds-backdrop slds-backdrop_open"></div>
-        </div>
-      </lightning-card>
-    </template>
-    <!-- END: MODAL -->
+          </lightning-card>
+        </template>
+        <!-- END: MODAL -->
+      </div>
+    </div>
   </div>
 </template>
