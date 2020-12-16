@@ -61,14 +61,39 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   handleConfirm() {
+    let cdIDs = [...this.toDelete];
+    console.log(cdIDs);
     this.showLoadingSpinner = true;
-    deleteDocuments({ cdIDs: this.toDelete })
+    deleteDocuments({ cdIDs: cdIDs })
       .then((res) => {
         if (res.success) {
-          let file = this.getDeletedFile();
-          this.updateContentDocumentIDs(file);
-          this.updateUploadedFileNames(file);
-          this.updateUploadedFiles(file);
+          // let file = this.getDeletedFile();
+          let file = this.uploadedFiles.filter((file) => {
+            return file.documentId === cdIDs[0];
+          })[0];
+          this.uploadedFileNames.filter((name) => {
+            return name !== file.name;
+          });
+          console.log(this.contentDocumentIDs);
+          this.contentDocumentIDs.filter((id) => {
+            return id !== file.documentId;
+          });
+          console.log(this.contentDocumentIDs);
+          this.uploadedFiles.filter((f) => {
+            return f.documentId !== file.documentId;
+          });
+          // this.contentDocumentIDs = this.contentDocumentIDs.filter((id) => {
+          //   return id !== file.documentId;
+          // });
+          // this.uploadedFileNames = this.uploadedFileNames.filter((name) => {
+          //   return name !== file.name;
+          // });
+          // this.uploadedFiles = this.uploadedFiles.filter((f) => {
+          //   return f.documentId !== file.documentId;
+          // });
+          // this.updateContentDocumentIDs(file);
+          // this.updateUploadedFileNames(file);
+          // this.updateUploadedFiles(file);
           // this.contentDocumentIDs = this.updateContentDocumentIDs(file);
           // this.uploadedFileNames = this.updateUploadedFileNames(file);
           // this.uploadedFiles = this.updateUploadedFiles(file);
@@ -99,27 +124,19 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   handleOnUploadFinished(e) {
+    console.log(this.toDelete);
     try {
       let files = e.detail.files;
       files.forEach((file) => {
         let f = this.updateFile(file);
         console.log("@f", f);
-        console.log(
-          this.contentDocumentIDs.hasOwnProperty("push"),
-          f.documentId
-        );
-        console.log(this.uploadedFileNames.hasOwnProperty("push"), f.name);
+        console.log(f.documentId);
+        console.log(f.name);
+        console.log(this.contentDocumentIDs);
         this.contentDocumentIDs.push(f.documentId);
+        console.log(this.contentDocumentIDs);
         this.uploadedFileNames.push(f.name);
         this.uploadedFiles.push(f);
-        console.log(
-          this.contentDocumentIDs.hasOwnProperty("push"),
-          Array.isArray(this.contentDocumentIDs)
-        );
-        console.log(
-          this.uploadedFileNames.hasOwnProperty("push"),
-          Array.isArray(this.uploadedFileNames)
-        );
       });
       this.toggleFileUploader();
       this.updateFlowProps();
