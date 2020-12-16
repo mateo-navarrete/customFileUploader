@@ -48,7 +48,9 @@ export default class CustomFileUploader extends LightningElement {
 
   handleDelete() {
     //@TODO
-    // show spinner
+    // hide/disable uploader @ show spinner/loading
+    // @loaded/!loading updateShowStateUploader etc
+    //
     // show notification(success/error)
     let cdIDs = this.doomed;
     this.loading = true;
