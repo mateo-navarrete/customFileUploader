@@ -2,7 +2,7 @@
  * @description       : Allows for deletion of the content documents uploaded by the user via the customFileUploader lwc
  * @author            : mateo navarrete
  * @group             : BizOps
- * @last modified on  : 12-15-2020
+ * @last modified on  : 12-16-2020
  * @last modified by  : mateo navarrete
  * Modifications Log
  * Ver   Date         Author            Modification
@@ -18,8 +18,6 @@ public with sharing class CustomFileUploaderController {
       cd = [SELECT Id FROM ContentDocument WHERE Id = :cdIDs];
       delete cd;
       result.put('success', true);
-      //   delete [SELECT Id FROM ContentDocument WHERE Id = :cdIDs];
-      //   return 'SUCCESS';
     } catch (Exception e) {
       result.put('success', false);
       throw new AuraHandledException(

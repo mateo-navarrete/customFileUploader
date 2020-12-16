@@ -35,9 +35,9 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   getDeletedFile() {
-    return this.uploadedFiles.filter(
-      (f) => f.documentId === this.toDelete[0]
-    )[0];
+    return this.uploadedFiles.filter((f) => {
+      return f.documentId === this.toDelete[0];
+    })[0];
   }
 
   getExt(ext) {
@@ -55,6 +55,9 @@ export default class CustomFileUploader extends LightningElement {
   handleClick(e) {
     const { name, value } = e.target;
     const method = "handle" + name.charAt(0).toUpperCase() + name.slice(1);
+    // console.log(name, value);
+    // console.log(method);
+    // console.log(this[method]);
     if (this[method]) this[method](value);
     this.showModal = !this.showModal;
   }
@@ -64,10 +67,13 @@ export default class CustomFileUploader extends LightningElement {
     deleteDocuments({ cdIDs: this.toDelete })
       .then((res) => {
         if (res.success) {
-          let file = getDeletedFile();
-          this.contentDocumentIDs = updateContentDocumentIDs(file);
-          this.uploadedFileNames = updateUploadedFileNames(file);
-          this.uploadedFiles = updateUploadedFiles(file);
+          let file = this.getDeletedFile();
+          this.updateContentDocumentIDs(file);
+          this.updateUploadedFileNames(file);
+          this.updateUploadedFiles(file);
+          // this.contentDocumentIDs = this.updateContentDocumentIDs(file);
+          // this.uploadedFileNames = this.updateUploadedFileNames(file);
+          // this.uploadedFiles = this.updateUploadedFiles(file);
           this.toggleFileUploader();
           this.updateFlowProps();
         } else {
@@ -93,25 +99,22 @@ export default class CustomFileUploader extends LightningElement {
     this.toDelete.push(value);
   }
 
-  updateContentDocumentIDs(file) {
-    return this.contentDocumentIDs.filter((id) => id !== file.documentId);
-  }
-
-  updateUploadedFileNames(file) {
-    return this.uploadedFileNames.filter((name) => name !== file.name);
-  }
-
-  updateUploadedFiles(file) {
-    return this.uploadedFiles.filter((f) => f.documentId !== file.documentId);
-  }
-
   handleOnUploadFinished(e) {
     try {
       let files = e.detail.files;
       files.forEach((file) => {
+        let f = this.updateFile(file);
+        console.log(
+          this.contentDocumentIDs.length,
+          this.uploadedFileNames.length,
+          this.uploadedFiles.length,
+          f
+        );
+        console.log(this.contentDocumentIDs, file.documentId);
         this.contentDocumentIDs.push(file.documentId);
+        console.log(this.contentDocumentIDs, file.documentId);
         this.uploadedFileNames.push(file.name);
-        this.uploadedFiles.push(this.updateFile(file));
+        this.uploadedFiles.push(f);
       });
       this.toggleFileUploader();
       this.updateFlowProps();
@@ -139,10 +142,31 @@ export default class CustomFileUploader extends LightningElement {
     this.deactivateFileUploader = true;
   }
 
+  updateContentDocumentIDs(file) {
+    this.contentDocumentIDs = this.contentDocumentIDs.filter((id) => {
+      return id !== file.documentId;
+    });
+    // return this.contentDocumentIDs.filter((id) => id !== file.documentId);
+  }
+
   updateFile(file) {
     file.ext = this.getExt(file.name.split(".")[1]);
     file.icon = "doctype:" + file.ext;
     return file;
+  }
+
+  updateUploadedFileNames(file) {
+    this.uploadedFileNames = this.uploadedFileNames.filter((name) => {
+      return name !== file.name;
+    });
+    // return this.uploadedFileNames.filter((name) => name !== file.name);
+  }
+
+  updateUploadedFiles(file) {
+    this.uploadedFiles = this.uploadedFiles.filter((f) => {
+      return f.documentId !== file.documentId;
+    });
+    // return this.uploadedFiles.filter((f) => f.documentId !== file.documentId);
   }
 
   updateFlowProps() {
