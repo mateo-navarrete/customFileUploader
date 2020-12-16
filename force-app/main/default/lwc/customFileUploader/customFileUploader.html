@@ -1,5 +1,5 @@
 <!--
-  @description       : Upload & display uploaded files in datatable
+  @description       : Upload files to sf db. Display those files in a datatable with delete functionality
   @author            : mateo navarrete
   @group             : BizOps
   @last modified on  : 12-15-2020
@@ -12,7 +12,7 @@
   <div class={flexipageRegionWidth}>
     <lightning-file-upload
       accept={acceptedFormats}
-      disabled={inactive}
+      disabled={showStateHideUploader}
       label={label}
       multiple={multipleFiles}
       name="customFileUploader"
@@ -21,6 +21,20 @@
       title={title}
     >
     </lightning-file-upload>
+
+    <template if:true={showStateLoading}>
+      <div
+        class="slds-box slds-box_x-small slds-m-around_x-small slds-theme_default"
+      >
+        <div class="slds-box" style="border: none; position: relative">
+          <lightning-spinner
+            alternative-text="Loading..."
+            size="small"
+            variant="brand"
+          ></lightning-spinner>
+        </div>
+      </div>
+    </template>
 
     <template if:true={showStateFilesUploaded}>
       <lightning-card>

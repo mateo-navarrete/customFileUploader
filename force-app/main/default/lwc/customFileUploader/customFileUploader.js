@@ -15,8 +15,9 @@ export default class CustomFileUploader extends LightningElement {
   @api uploadedFileNames = [];
   @track uploadedFiles = [];
   flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
-  inactive = false;
+  showStateHideUploader = false;
 
+  loading = false;
   doomed = [];
 
   showStateModal = false; //used to hide/show dialog
@@ -50,25 +51,31 @@ export default class CustomFileUploader extends LightningElement {
     // show spinner
     // show notification(success/error)
     let cdIDs = this.doomed;
+    this.loading = true;
     deleteDocuments({ cdIDs: cdIDs })
       .then((res) => {
-        console.log("res", res);
+        // console.log("res", res);
         if (res.success) {
           let file = this.uploadedFiles.filter((file) => {
             return file.documentId === cdIDs[0];
           })[0];
-          this.uploadedFileNames.filter((name) => {
+          // console.log("@res", file);
+          this.uploadedFileNames = this.uploadedFileNames.filter((name) => {
             return name !== file.name;
           });
-          this.contentDocumentIDs.filter((id) => {
+          // console.log("uFN", this.uploadedFileNames);
+          this.contentDocumentIDs = this.contentDocumentIDs.filter((id) => {
             return id !== file.documentId;
           });
-          this.uploadedFiles.filter((f) => {
+          // console.log("cDids", this.contentDocumentIDs);
+          this.uploadedFiles = this.uploadedFiles.filter((f) => {
             return f.documentId !== file.documentId;
           });
+          // console.log("uF", this.uploadedFiles);
           this.flowProps.forEach((prop) =>
             this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
           );
+          // this.updateShowUploader();
           this.updateShowState();
         }
       })
@@ -77,6 +84,7 @@ export default class CustomFileUploader extends LightningElement {
       })
       .finally(() => {
         this.doomed = [];
+        this.loading = false;
       });
   }
 
@@ -168,12 +176,16 @@ export default class CustomFileUploader extends LightningElement {
   //   }
   // }
 
+  get showStateLoading() {
+    return this.loading;
+  }
+
   get acceptedFormats() {
     return this.formats.split(",");
   }
 
   get showStateFilesUploaded() {
-    return this.uploadedFiles.length > 0;
+    return this.uploadedFiles.length > 0 && !this.loading;
   }
 
   getExt(ext) {
@@ -201,16 +213,16 @@ export default class CustomFileUploader extends LightningElement {
     }
   }
 
-  showStateActive() {
-    return this.multipleFiles || !this.showStateFilesUploaded;
+  showStateUploader() {
+    return this.multipleFiles || this.uploadedFiles.length > 0;
   }
 
   updateShowState() {
-    if (this.showStateActive()) {
-      this.inactive = false;
+    if (this.showStateUploader()) {
+      this.showStateHideUploader = false;
       return;
     }
-    this.inactive = true;
+    this.showStateHideUploader = true;
   }
 
   updateUploadedFiles(file) {
