@@ -13,184 +13,32 @@ export default class CustomFileUploader extends LightningElement {
   @api recordId;
   @api title = "Upload files";
   @api uploadedFileNames = [];
-  @track uploadedFiles = [];
-  flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
-  showStateHideUploader = false;
-
-  loading = false;
-  doomed = [];
-
-  showStateModal = false; //used to hide/show dialog
-  modalHeader = "Delete File"; //modal title
-  modalContent = "Are you sure you want to delete this file?"; //modal message
-  // name = "confirmModal"; //reference name of the component
-  confirmLabel = "Delete"; //confirm button label
-  cancelLabel = "Cancel"; //cancel button label
-  // originalMessage; //any event/message/detail to be published back to the parent component
-  handleClick(e) {
-    const { name, value } = e.target;
-    console.log("@value", value);
-    console.log("@name", name);
-    if (name === "delete") {
-      this.doomed.push(value);
-    } else if (name === "cancel") {
-      this.doomed = [];
-    } else if (name === "confirm") {
-      this.handleDelete();
-    }
-    console.log("uploaded", this.uploadedFiles);
-    console.log("doomed", this.doomed);
-    // console.log("@handleClick", e);
-    // console.log("e.target", e.target);
-    // console.log("e.target.name", e.target.name);
-    this.showStateModal = !this.showStateModal;
-  }
-
-  handleDelete() {
-    //@TODO
-    // hide/disable uploader @ show spinner/loading
-    // @loaded/!loading updateShowStateUploader etc
-    //
-    // show notification(success/error)
-    let cdIDs = this.doomed;
-    this.loading = true;
-    deleteDocuments({ cdIDs: cdIDs })
-      .then((res) => {
-        // console.log("res", res);
-        if (res.success) {
-          let file = this.uploadedFiles.filter((file) => {
-            return file.documentId === cdIDs[0];
-          })[0];
-          // console.log("@res", file);
-          let copyUFN = this.uploadedFileNames.filter((name) => {
-            return name !== file.name;
-          });
-          this.uploadedFileNames = copyUFN;
-          // console.log("uFN", this.uploadedFileNames);
-          let copyCDI = this.contentDocumentIDs.filter((id) => {
-            return id !== file.documentId;
-          });
-          this.contentDocumentIDs = copyCDI;
-          // console.log("cDids", this.contentDocumentIDs);
-          let copyUF = this.uploadedFiles.filter((f) => {
-            return f.documentId !== file.documentId;
-          });
-          this.uploadedFiles = copyUF;
-          // console.log("uF", this.uploadedFiles);
-          this.flowProps.forEach((prop) =>
-            this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
-          );
-          // this.updateShowUploader();
-          this.updateShowState();
-        }
-      })
-      .catch((e) => {
-        console.error(e);
-      })
-      .finally(() => {
-        this.doomed = [];
-        this.loading = false;
-      });
-  }
-
-  // handleRowAction = (e) => {
-  //   console.log(JSON.stringify(e.detail));
-  //   this.template
-  //     .querySelector("[data-id=spinner]")
-  //     .classList.remove("slds-hide");
-  //   deleteDocuments({ docIds: [e.detail.row.Id] })
-  //     .then((response) => {
-  //       this.dispatchEvent(
-  //         new ShowToastEvent({
-  //           title: "Success",
-  //           message: "Successfully deleted!",
-  //           variant: "success"
-  //         })
-  //       );
-  //       this.template
-  //         .querySelector("[data-id=spinner]")
-  //         .classList.add("slds-hide");
-  //       this.template.querySelector("c-datatable[data-id=documents]").refresh();
-  //     })
-  //     .catch((error) => {
-  //       this.dispatchEvent(
-  //         new ShowToastEvent({
-  //           title: "Error",
-  //           message: error,
-  //           variant: "error"
-  //         })
-  //       );
-  //       this.template
-  //         .querySelector("[data-id=spinner]")
-  //         .classList.add("slds-hide");
-  //     });
+  // testFile = {
+  //   name: "testFile.pdf",
+  //   icon: "doctype:pdf",
+  //   documentId: "testdocid000",
+  //   ext: "pdf"
   // };
-
-  // handleDelete(e) {
-  //   if (e.target) {
-  //     if (e.target.name === "openConfirmation") {
-  //       //it can be set dynamically based on your logic
-  //       this.originalMessage = e.currentTarget.dataset.id;
-  //       //shows the component
-  //       this.isDialogVisible = true;
-  //     } else if (e.target.name === "confirmModal") {
-  //       if (e.detail !== 1) {
-  //         if (e.detail.status === "confirm") {
-  //           //delete content document
-  //           let contentDocumentId = e.detail.originalMessage;
-  //           deleteRecord(contentDocumentId)
-  //             .then(() => {
-  //               this.dispatchEvent(
-  //                 new ShowToastEvent({
-  //                   title: "Success",
-  //                   message: "File deleted",
-  //                   variant: "success"
-  //                 })
-  //               );
-  //               this.dispatchEvent(new CustomEvent("filedelete", {}));
-  //             })
-  //             .catch((error) => {
-  //               this.dispatchEvent(
-  //                 new ShowToastEvent({
-  //                   title: "Error deleting file",
-  //                   message: error.body.message,
-  //                   variant: "error"
-  //                 })
-  //               );
-  //             });
-  //         }
-  //       }
-
-  //       //hides the component
-  //       this.isDialogVisible = false;
-  //     }
-  //   }
-  // }
-
-  //handles button clicks
-  // handleClick(e) {
-  //   //creates object which will be published to the parent component
-  //   if (e.target) {
-  //     let finalEvent = {
-  //       originalMessage: this.originalMessage,
-  //       status: e.target.name
-  //     };
-
-  //     //dispatch a 'click' e so the parent component can handle it
-  //     this.dispatchEvent(new CustomEvent("click", { detail: finalEvent }));
-  //   }
-  // }
-
-  get showStateLoading() {
-    return this.loading;
-  }
+  @track uploadedFiles = [];
+  deactivateFileUploader = false;
+  flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
+  showLoadingSpinner = false;
+  showModal = false;
+  toDelete = [];
 
   get acceptedFormats() {
     return this.formats.split(",");
   }
 
-  get showStateFilesUploaded() {
-    return this.uploadedFiles.length > 0 && !this.loading;
+  get showUploadedFiles() {
+    return this.uploadedFiles.length > 0;
+  }
+
+  getDeletedFile() {
+    let deleted = this.uploadedFiles.filter((f) => {
+      return f.documentId === this.toDelete[0];
+    });
+    return deleted[0];
   }
 
   getExt(ext) {
@@ -201,66 +49,171 @@ export default class CustomFileUploader extends LightningElement {
     return "attachment";
   }
 
+  handleCancel() {
+    this.toDelete = [];
+  }
+
+  handleClick(e) {
+    const { name, value } = e.target;
+    const method = "handle" + name.charAt(0).toUpperCase() + name.slice(1);
+    if (this[method]) this[method](value);
+    console.log(method);
+    this.showModal = !this.showModal;
+  }
+
+  handleConfirm() {
+    let cdIDs = [...this.toDelete];
+    console.log("toDelete", cdIDs);
+    this.showLoadingSpinner = true;
+    deleteDocuments({ cdIDs: cdIDs })
+      .then((res) => {
+        console.log("@res", res.success, typeof res.success);
+        if (res.success) {
+          // let file = this.getDeletedFile();
+          let file = this.uploadedFiles.filter((file) => {
+            return file.documentId === cdIDs[0];
+          })[0];
+          let a = this.uploadedFileNames.filter((name) => {
+            return name !== file.name;
+          });
+          this.uploadedFileNames = a;
+          // console.log(this.contentDocumentIDs);
+          let b = this.contentDocumentIDs.filter((id) => {
+            return id !== file.documentId;
+          });
+          this.contentDocumentIDs = b;
+          // console.log(this.contentDocumentIDs);
+          let c = this.uploadedFiles.filter((f) => {
+            return f.documentId !== file.documentId;
+          });
+          this.uploadedFiles = c;
+          // this.contentDocumentIDs = this.contentDocumentIDs.filter((id) => {
+          //   return id !== file.documentId;
+          // });
+          // this.uploadedFileNames = this.uploadedFileNames.filter((name) => {
+          //   return name !== file.name;
+          // });
+          // this.uploadedFiles = this.uploadedFiles.filter((f) => {
+          //   return f.documentId !== file.documentId;
+          // });
+          // this.updateContentDocumentIDs(file);
+          // this.updateUploadedFileNames(file);
+          // this.updateUploadedFiles(file);
+          // this.contentDocumentIDs = this.updateContentDocumentIDs(file);
+          // this.uploadedFileNames = this.updateUploadedFileNames(file);
+          // this.uploadedFiles = this.updateUploadedFiles(file);
+          this.toggleFileUploader();
+          this.updateFlowProps();
+        } else {
+          throw new Error("Error deleting file.");
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        // this.dispatchEvent(
+        //   new ShowToastEvent({
+        //     title: "Error",
+        //     message: error,
+        //     variant: "error"
+        //   })
+        // );
+      })
+      .finally(() => {
+        this.toDelete = [];
+        console.log("@finally:", JSON.parse(JSON.stringify(this)));
+        this.showLoadingSpinner = false;
+      });
+  }
+
+  handleDelete(value) {
+    this.toDelete.push(value);
+  }
+
   handleOnUploadFinished(e) {
+    console.log(this.toDelete);
     try {
       let files = e.detail.files;
       files.forEach((file) => {
-        console.log(
-          "@CDI",
-          typeof this.contentDocumentIDs,
-          this.contentDocumentIDs,
-          JSON.parse(JSON.stringify(this.contentDocumentIDs))
-        );
+        let f = this.updateFile(file);
+        console.log("@f", f);
+        console.log(f.documentId);
+        console.log(f.name);
         let a = JSON.parse(JSON.stringify(this.contentDocumentIDs));
-        a.push(file.documentId);
-        this.contentDocumentIDs = a;
-        // this.contentDocumentIDs.push(file.documentId);
-        console.log(
-          "@UFN",
-          typeof this.uploadedFileNames,
-          this.uploadedFileNames,
-          JSON.parse(JSON.stringify(this.uploadedFileNames))
-        );
         let b = JSON.parse(JSON.stringify(this.uploadedFileNames));
-        b.push(file.name);
+        let c = JSON.parse(JSON.stringify(this.uploadedFiles));
+        console.log(a, b, c);
+        a.push(f.documentId);
+        this.contentDocumentIDs = a;
+        // this.contentDocumentIDs.push(f.documentId);
+        // console.log(this.contentDocumentIDs);
+        b.push(f.name);
         this.uploadedFileNames = b;
-        // this.uploadedFileNames.push(file.name);
-        console.log(
-          "@UUF",
-          typeof this.uploadedFiles,
-          this.uploadedFiles,
-          JSON.parse(JSON.stringify(this.uploadedFiles))
-        );
-        this.updateUploadedFiles(file);
+        // this.uploadedFileNames.push(f.name);
+        c.push(f);
+        this.uploadedFiles = c;
+        // this.uploadedFiles.push(f);
+        console.log(a, b, c);
       });
-      this.flowProps.forEach((prop) =>
-        this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
-      );
-      this.updateShowState();
+      this.toggleFileUploader();
+      this.updateFlowProps();
     } catch (err) {
       console.error(err);
+      // this.dispatchEvent(
+      //   new ShowToastEvent({
+      //     title: "Error",
+      //     message: error,
+      //     variant: "error"
+      //   })
+      // );
     }
   }
 
-  showStateUploader() {
+  showFileUploader() {
     return this.multipleFiles || !this.uploadedFiles.length;
-    // return this.multipleFiles || this.uploadedFiles.length > 0;
+    // return this.multipleFiles || this.uploadedFiles.length < 1;
   }
 
-  updateShowState() {
-    if (this.showStateUploader()) {
-      this.showStateHideUploader = false;
+  toggleFileUploader() {
+    if (this.showFileUploader()) {
+      this.deactivateFileUploader = false;
       return;
     }
-    this.showStateHideUploader = true;
+    this.deactivateFileUploader = true;
+  }
+
+  updateContentDocumentIDs(file) {
+    let a = JSON.parse(JSON.stringify(this.contentDocumentIDs));
+    this.contentDocumentIDs = a.filter((id) => {
+      return id !== file.documentId;
+    });
+    // return this.contentDocumentIDs.filter((id) => id !== file.documentId);
+  }
+
+  updateFile(file) {
+    file.ext = this.getExt(file.name.split(".")[1]);
+    file.icon = "doctype:" + file.ext;
+    return file;
+  }
+
+  updateUploadedFileNames(file) {
+    let a = JSON.parse(JSON.stringify(this.uploadedFileNames));
+    this.uploadedFileNames = a.filter((name) => {
+      return name !== file.name;
+    });
+    // return this.uploadedFileNames.filter((name) => name !== file.name);
   }
 
   updateUploadedFiles(file) {
-    let copy = [...this.uploadedFiles];
-    file.ext = this.getExt(file.name.split(".")[1]);
-    file.icon = "doctype:" + file.ext;
-    copy.push(file);
-    this.uploadedFiles = copy;
-    // this.uploadedFiles.push(file);
+    let a = JSON.parse(JSON.stringify(this.uploadedFiles));
+    this.uploadedFiles = a.filter((f) => {
+      return f.documentId !== file.documentId;
+    });
+    // return this.uploadedFiles.filter((f) => f.documentId !== file.documentId);
+  }
+
+  updateFlowProps() {
+    this.flowProps.forEach((prop) =>
+      this.dispatchEvent(new FlowAttributeChangeEvent(prop, this[prop]))
+    );
   }
 }
