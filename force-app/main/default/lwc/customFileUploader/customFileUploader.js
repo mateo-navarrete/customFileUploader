@@ -1,6 +1,6 @@
 import { LightningElement, api, track } from "lwc";
 import { FlowAttributeChangeEvent } from "lightning/flowSupport";
-// import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import deleteDocuments from "@salesforce/apex/CustomFileUploaderController.deleteDocuments";
 
 export default class CustomFileUploader extends LightningElement {
@@ -13,12 +13,6 @@ export default class CustomFileUploader extends LightningElement {
   @api recordId;
   @api title = "Upload files";
   @api uploadedFileNames = [];
-  // testFile = {
-  //   name: "testFile.pdf",
-  //   icon: "doctype:pdf",
-  //   documentId: "testdocid000",
-  //   ext: "pdf"
-  // };
   @track uploadedFiles = [];
   deactivateFileUploader = false;
   flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
@@ -34,10 +28,19 @@ export default class CustomFileUploader extends LightningElement {
     return this.uploadedFiles.length > 0;
   }
 
+  filterContentDocumentIDs(file) {
+    return this.contentDocumentIDs.filter((id) => id !== file.documentId);
+  }
+
+  filterUploadedFileNames(file) {
+    return this.uploadedFileNames.filter((name) => name !== file.name);
+  }
+
+  filterUploadedFiles(file) {
+    return this.uploadedFiles.filter((f) => f.documentId !== file.documentId);
+  }
+
   getDeletedFile() {
-    // let deleted = this.uploadedFiles.filter((f) => {
-    //   return f.documentId === this.toDelete[0];
-    // });
     let deleted = this.uploadedFiles.filter(
       (f) => f.documentId === this.toDelete[0]
     );
@@ -68,63 +71,22 @@ export default class CustomFileUploader extends LightningElement {
     this.showLoadingSpinner = true;
     deleteDocuments({ cdIDs: cdIDs })
       .then((res) => {
-        // console.log("@res", res.success, typeof res.success);
         if (res.success) {
           let file = this.getDeletedFile();
-          this.contentDocumentIDs = this.updateContentDocumentIDs(file);
-          this.uploadedFileNames = this.updateUploadedFileNames(file);
-          this.uploadedFiles = this.updateUploadedFiles(file);
-          // this.updateContentDocumentIDs(file);
-          // this.updateUploadedFileNames(file);
-          // this.updateUploadedFiles(file);
-          // let file = this.uploadedFiles.filter((file) => {
-          //   return file.documentId === cdIDs[0];
-          // })[0];
-          //
-          // let a = this.uploadedFileNames.filter((name) => {
-          //   return name !== file.name;
-          // });
-          // this.uploadedFileNames = a;
-          // // console.log(this.contentDocumentIDs);
-          // let b = this.contentDocumentIDs.filter((id) => {
-          //   return id !== file.documentId;
-          // });
-          // this.contentDocumentIDs = b;
-          // // console.log(this.contentDocumentIDs);
-          // let c = this.uploadedFiles.filter((f) => {
-          //   return f.documentId !== file.documentId;
-          // });
-          // this.uploadedFiles = c;
-          //
-          // this.contentDocumentIDs = this.contentDocumentIDs.filter((id) => {
-          //   return id !== file.documentId;
-          // });
-          // this.uploadedFileNames = this.uploadedFileNames.filter((name) => {
-          //   return name !== file.name;
-          // });
-          // this.uploadedFiles = this.uploadedFiles.filter((f) => {
-          //   return f.documentId !== file.documentId;
-          // });
+          this.contentDocumentIDs = this.filterContentDocumentIDs(file);
+          this.uploadedFileNames = this.filterUploadedFileNames(file);
+          this.uploadedFiles = this.filterUploadedFiles(file);
           this.toggleFileUploader();
           this.updateFlowProps();
         } else {
           throw new Error("Error deleting file.");
         }
       })
-      .catch((e) => {
-        console.error(e);
-        // @TODO
-        // this.dispatchEvent(
-        //   new ShowToastEvent({
-        //     title: "Error",
-        //     message: error,
-        //     variant: "error"
-        //   })
-        // );
+      .catch((error) => {
+        this.showErrorMsg(error);
       })
       .finally(() => {
         this.toDelete = [];
-        // console.log("@finally:", JSON.parse(JSON.stringify(this)));
         this.showLoadingSpinner = false;
       });
   }
@@ -134,47 +96,58 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   handleOnUploadFinished(e) {
-    console.log(this.toDelete);
     try {
       let files = e.detail.files;
-      files.forEach((file) => {
-        let f = this.updateFile(file);
-        // console.log("@f", f);
-        // console.log(f.documentId);
-        // console.log(f.name);
-        let a = JSON.parse(JSON.stringify(this.contentDocumentIDs));
-        let b = JSON.parse(JSON.stringify(this.uploadedFileNames));
-        let c = JSON.parse(JSON.stringify(this.uploadedFiles));
-        console.log(a, b, c);
-        a.push(f.documentId);
-        this.contentDocumentIDs = a;
-        // this.contentDocumentIDs.push(f.documentId);
-        // console.log(this.contentDocumentIDs);
-        b.push(f.name);
-        this.uploadedFileNames = b;
-        // this.uploadedFileNames.push(f.name);
-        c.push(f);
-        this.uploadedFiles = c;
-        // this.uploadedFiles.push(f);
-        console.log(a, b, c);
+      files.forEach((f) => {
+        let file = this.updateFile(f);
+        this.contentDocumentIDs = this.updateItems(
+          "contentDocumentIDs",
+          file.documentId
+        );
+        this.uploadedFileNames = this.updateItems(
+          "uploadedFileNames",
+          file.name
+        );
+        this.uploadedFiles = this.updateItems("uploadedFiles", file);
       });
       this.toggleFileUploader();
       this.updateFlowProps();
-    } catch (err) {
-      console.error(err);
-      // this.dispatchEvent(
-      //   new ShowToastEvent({
-      //     title: "Error",
-      //     message: error,
-      //     variant: "error"
-      //   })
-      // );
+    } catch (error) {
+      this.showErrorMsg(error);
     }
+  }
+
+  showErrorMsg(error) {
+    let eMsg;
+    if (error.body) {
+      if (error.body.message) {
+        eMsg = error.body.message;
+        if (error.body.stackTrace) {
+          eMsg = error.body.message + "\nStackTrace:\n" + error.body.stackTrace;
+        }
+      }
+    }
+    const errMsg = {
+      title: "ERROR: customFileUploader",
+      message: eMsg || error.message,
+      variant: "error",
+      mode: "sticky"
+    };
+    this.showNotification(errMsg);
   }
 
   showFileUploader() {
     return this.multipleFiles || !this.uploadedFiles.length;
-    // return this.multipleFiles || this.uploadedFiles.length < 1;
+  }
+
+  showNotification(msg) {
+    const notification = new ShowToastEvent({
+      title: msg.title,
+      message: msg.message,
+      variant: msg.variant,
+      mode: msg.mode
+    });
+    this.dispatchEvent(notification);
   }
 
   toggleFileUploader() {
@@ -185,34 +158,16 @@ export default class CustomFileUploader extends LightningElement {
     this.deactivateFileUploader = true;
   }
 
-  updateContentDocumentIDs(file) {
-    // let a = JSON.parse(JSON.stringify(this.contentDocumentIDs));
-    // this.contentDocumentIDs = a.filter((id) => {
-    //   return id !== file.documentId;
-    // });
-    return this.contentDocumentIDs.filter((id) => id !== file.documentId);
-  }
-
   updateFile(file) {
     file.ext = this.getExt(file.name.split(".")[1]);
     file.icon = "doctype:" + file.ext;
     return file;
   }
 
-  updateUploadedFileNames(file) {
-    // let a = JSON.parse(JSON.stringify(this.uploadedFileNames));
-    // this.uploadedFileNames = a.filter((name) => {
-    //   return name !== file.name;
-    // });
-    return this.uploadedFileNames.filter((name) => name !== file.name);
-  }
-
-  updateUploadedFiles(file) {
-    // let a = JSON.parse(JSON.stringify(this.uploadedFiles));
-    // this.uploadedFiles = a.filter((f) => {
-    //   return f.documentId !== file.documentId;
-    // });
-    return this.uploadedFiles.filter((f) => f.documentId !== file.documentId);
+  updateItems(items, item) {
+    let copy = [...this[items]];
+    copy.push(item);
+    return copy;
   }
 
   updateFlowProps() {
