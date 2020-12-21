@@ -37,11 +37,9 @@ public class CustomFileUploaderTest {
         IsMajorVersion = true
       );
       insert cvData;
-
       ContentDocument[] cd = [SELECT Id, Title FROM ContentDocument];
       String[] cdIDs = new List<String>();
       cdIDs.add(cd[0].Id);
-
       Map<String, Boolean> result = CustomFileUploaderController.deleteDocuments(
         cdIDs
       );
