@@ -11,6 +11,20 @@
 @isTest
 public class CustomFileUploaderTest {
   @isTest
+  static void testErrMsg() {
+    Test.startTest();
+    try {
+      String errMsg = CustomFileUploaderController.getErrMsg('msg');
+      System.assert(errMsg.contains('ExceptionMessage:'));
+      System.assert(errMsg.contains('msg'));
+    } catch (Exception e) {
+      System.assert(e.getMessage().contains('ExceptionMessage:'));
+      System.assert(e.getMessage().contains('msg'));
+    }
+    Test.stopTest();
+  }
+
+  @isTest
   static void testDeleteDocumentsSuccess() {
     Test.startTest();
     Map<String, Boolean> testMap = new Map<String, Boolean>();
@@ -32,45 +46,9 @@ public class CustomFileUploaderTest {
         cdIDs
       );
       System.assertEquals(testMap, result, 'Expected success === true.');
-
-      // ContentVersion cvId = [
-      //   SELECT Id, Title, ContentDocumentId
-      //   FROM ContentVersion
-      //   WHERE Id = :cvData.Id
-      //   LIMIT 1
-      // ];
-      // String[] testDocs = new List<String>();
-      // testDocs.add(cvData.id);
-      // Map<String, Boolean> tdResult = CustomFileUploaderController.deleteDocuments(
-      //   testDocs
-      // );
     } catch (Exception e) {
       System.assert(
         e.getMessage().contains('ExceptionMessage:'),
-        'Expected a specific err msg.'
-      );
-      System.assert(
-        e.getMessage().contains('ExceptionCause:'),
-        'Expected a specific err msg.'
-      );
-    }
-    Test.stopTest();
-  }
-
-  @isTest
-  static void testDeleteDocumentsError() {
-    Test.startTest();
-    try {
-      String[] testDocs = new List<String>();
-      testDocs.add('06941000000vgsFAAQ');
-      CustomFileUploaderController.deleteDocuments(testDocs);
-    } catch (Exception e) {
-      System.assert(
-        e.getMessage().contains('ExceptionMessage:'),
-        'Expected a specific err msg.'
-      );
-      System.assert(
-        e.getMessage().contains('ExceptionCause:'),
         'Expected a specific err msg.'
       );
     }
