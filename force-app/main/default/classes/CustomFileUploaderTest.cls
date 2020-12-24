@@ -2,7 +2,7 @@
  * @description       : tests the functinality of CustomFileUploaderController
  * @author            : mateo navarrete
  * @group             : BizOps
- * @last modified on  : 12-21-2020
+ * @last modified on  : 12-24-2020
  * @last modified by  : mateo navarrete
  * Modifications Log
  * Ver   Date         Author            Modification
@@ -11,15 +11,15 @@
 @isTest
 public class CustomFileUploaderTest {
   @isTest
-  static void testErrMsg() {
+  static void testGetErrMsg() {
     Test.startTest();
     try {
-      String errMsg = CustomFileUploaderController.getErrMsg('msg');
+      String errMsg = CustomFileUploaderController.getErrMsg('testMsg');
       System.assert(errMsg.contains('ExceptionMessage:'));
-      System.assert(errMsg.contains('msg'));
+      System.assert(errMsg.contains('testMsg'));
     } catch (Exception e) {
       System.assert(e.getMessage().contains('ExceptionMessage:'));
-      System.assert(e.getMessage().contains('msg'));
+      System.assert(e.getMessage().contains('testMsg'));
     }
     Test.stopTest();
   }
