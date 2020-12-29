@@ -159,9 +159,10 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   updateFile(file) {
-    file.ext = this.getExt(file.name.split(".")[1]);
-    file.icon = "doctype:" + file.ext;
-    return file;
+    let copy = { ...file };
+    copy.ext = this.getExt(file.name.split(".")[1]);
+    copy.icon = "doctype:" + copy.ext;
+    return copy;
   }
 
   updateItems(items, item) {
