@@ -1,7 +1,7 @@
 import { LightningElement, api, track } from "lwc";
 import { FlowAttributeChangeEvent } from "lightning/flowSupport";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import deleteDocuments from "@salesforce/apex/CustomFileUploaderController.deleteDocuments";
+import { deleteRecord } from "lightning/uiRecordApi";
 
 export default class CustomFileUploader extends LightningElement {
   @api contentDocumentIDs = [];
@@ -16,9 +16,9 @@ export default class CustomFileUploader extends LightningElement {
   @track uploadedFiles = [];
   deactivateFileUploader = false;
   flowProps = ["contentDocumentIDs", "uploadedFileNames", "recordId"];
+  selectedRecordId = "";
   showLoadingSpinner = false;
   showModal = false;
-  toDelete = [];
 
   get acceptedFormats() {
     return this.formats.split(",");
@@ -42,7 +42,7 @@ export default class CustomFileUploader extends LightningElement {
 
   getDeletedFile() {
     let deleted = this.uploadedFiles.filter(
-      (f) => f.documentId === this.toDelete[0]
+      (f) => f.documentId === this.selectedRecordId
     );
     return deleted[0];
   }
@@ -56,7 +56,7 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   handleCancel() {
-    this.toDelete = [];
+    this.selectedRecordId = "";
   }
 
   handleClick(e) {
@@ -67,32 +67,27 @@ export default class CustomFileUploader extends LightningElement {
   }
 
   handleConfirm() {
-    let cdIDs = [...this.toDelete];
     this.showLoadingSpinner = true;
-    deleteDocuments({ cdIDs: cdIDs })
-      .then((res) => {
-        if (res.success) {
-          let file = this.getDeletedFile();
-          this.contentDocumentIDs = this.filterContentDocumentIDs(file);
-          this.uploadedFileNames = this.filterUploadedFileNames(file);
-          this.uploadedFiles = this.filterUploadedFiles(file);
-          this.toggleFileUploader();
-          this.updateFlowProps();
-        } else {
-          throw new Error("Error deleting file.");
-        }
+    deleteRecord(this.selectedRecordId)
+      .then(() => {
+        let file = this.getDeletedFile();
+        this.contentDocumentIDs = this.filterContentDocumentIDs(file);
+        this.uploadedFileNames = this.filterUploadedFileNames(file);
+        this.uploadedFiles = this.filterUploadedFiles(file);
+        this.toggleFileUploader();
+        this.updateFlowProps();
       })
       .catch((error) => {
         this.showErrorMsg(error);
       })
       .finally(() => {
-        this.toDelete = [];
+        this.selectedRecordId = "";
         this.showLoadingSpinner = false;
       });
   }
 
   handleDelete(value) {
-    this.toDelete.push(value);
+    this.selectedRecordId = value;
   }
 
   handleOnUploadFinished(e) {
